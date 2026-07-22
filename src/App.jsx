@@ -7,6 +7,7 @@ function App(){
   return savedTasks ? JSON.parse(savedTasks) : [];
   });
   const [editIndex, setEditIndex] = useState(null);
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
   console.log("Saving tasks:", tasks);
@@ -75,6 +76,15 @@ function App(){
   const completedTasks = tasks.filter((item) => item.completed).length;
   const remainingTasks = totalTasks - completedTasks;
 
+  const filteredTasks = tasks.map((item, index) => ({ ...item, originalIndex :index })).filter((item) => {
+    if (filter === "active") {
+      return !item.completed;
+    } else if (filter === "completed") {
+      return item.completed;
+    }
+    return true; 
+  });
+
   return(
     <div className="container">
       <h1>React ToDo App</h1>
@@ -89,13 +99,26 @@ function App(){
          <p>Total Tasks: {totalTasks}</p>
          <p>Completed Tasks: {completedTasks}</p>
          <p>Remaining Tasks: {remainingTasks}</p>
+
+         <div className="filter-buttons">
+          <button className={filter === "all" ? "active-filter" : ""} onClick={()=> setFilter("all")}>All</button>
+          <button className={filter === "active" ? "active-filter" : ""} onClick={()=> setFilter("active")}>Active</button>
+          <button className={filter === "completed" ? "active-filter" : ""} onClick={()=> setFilter("completed")}>Completed</button>
+         </div>
       <ul>
-        {tasks.length === 0?(<p>No tasks yet. Add your first task 🚀</p>):(
-        tasks.map((item, index) => (<li key={index} onClick={() => toggleTask(index)} style={{textDecoration: item.completed ? "line-through" : "none",cursor: "pointer"}}>
-          {item.text} 
-          <button onClick={(event) => {
-           event.stopPropagation();
-           editTask(index);
+        {filteredTasks.length === 0 ? 
+        (<p>
+          { filter==="all" && "No tasks yet. Add your first task 🚀"}
+          { filter==="active" && "No active tasks 🎉"}
+          {filter==="completed" && "No completed tasks yet ✅"}
+
+        </p>) : (
+          filteredTasks.map((item) => (
+            <li key={item.originalIndex} onClick={() => toggleTask(item.originalIndex)} style={{textDecoration: item.completed ? "line-through" : "none", cursor: "pointer"}}>
+              {item.text}
+              <button onClick={(event) => {
+                event.stopPropagation();
+                editTask(item.originalIndex);
           }}
           >
           ✏️
@@ -103,7 +126,7 @@ function App(){
 
         <button onClick={(event) => {
          event.stopPropagation();
-         deleteTask(index);
+         deleteTask(item.originalIndex);
         }}
         >
          🗑️

@@ -91,3 +91,21 @@ li:hover{
   width:100%;
   margin-top:20px;
 }
+
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.filter-buttons button {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.active-filter {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
