@@ -1,4 +1,10 @@
 import {useState, useEffect} from 'react';
+import Header from "./components/Header";
+import TaskInput from "./components/TaskInput";
+import TaskStats from "./components/TaskStats";
+import FilterButtons from "./components/FilterButtons";
+import TaskList from "./components/TaskList";
+import Footer from "./components/Footer";
 
 function App(){
   const [task, setTask] = useState("");
@@ -87,54 +93,35 @@ function App(){
 
   return(
     <div className="container">
-      <h1>React ToDo App</h1>
+      <Header />
 
-      <div className="input-section">
-        <input type="text" placeholder="Enter a task..." value={task} onChange={(e) => setTask(e.target.value)} onKeyDown={(event) => {if(event.key==="Enter"){addTask();}}} />
-        <button onClick={addTask}>
-        {editIndex !== null ? "Update" : "Add"}
-        </button>
-      </div>
-         <p>You typed: {task}</p>
-         <p>Total Tasks: {totalTasks}</p>
-         <p>Completed Tasks: {completedTasks}</p>
-         <p>Remaining Tasks: {remainingTasks}</p>
+      <TaskInput
+        task={task}
+        setTask={setTask}
+        addTask={addTask}
+        editIndex={editIndex}
+      />
+      
+      <TaskStats
+        totalTasks={totalTasks}
+        completedTasks={completedTasks}
+        remainingTasks={remainingTasks}
+      />
 
-         <div className="filter-buttons">
-          <button className={filter === "all" ? "active-filter" : ""} onClick={()=> setFilter("all")}>All</button>
-          <button className={filter === "active" ? "active-filter" : ""} onClick={()=> setFilter("active")}>Active</button>
-          <button className={filter === "completed" ? "active-filter" : ""} onClick={()=> setFilter("completed")}>Completed</button>
-         </div>
-      <ul>
-        {filteredTasks.length === 0 ? 
-        (<p>
-          { filter==="all" && "No tasks yet. Add your first task 🚀"}
-          { filter==="active" && "No active tasks 🎉"}
-          {filter==="completed" && "No completed tasks yet ✅"}
+      <FilterButtons
+        filter={filter}
+        setFilter={setFilter}
+      />
 
-        </p>) : (
-          filteredTasks.map((item) => (
-            <li key={item.originalIndex} onClick={() => toggleTask(item.originalIndex)} style={{textDecoration: item.completed ? "line-through" : "none", cursor: "pointer"}}>
-              {item.text}
-              <button onClick={(event) => {
-                event.stopPropagation();
-                editTask(item.originalIndex);
-          }}
-          >
-          ✏️
-         </button>
+      <TaskList
+        filteredTasks={filteredTasks}
+        filter={filter}
+        toggleTask={toggleTask}
+        editTask={editTask}
+        deleteTask={deleteTask}
+      />
 
-        <button onClick={(event) => {
-         event.stopPropagation();
-         deleteTask(item.originalIndex);
-        }}
-        >
-         🗑️
-        </button>
-        </li>)))}
-      </ul>
-
-      <button className="clear-btn" onClick={clearAllTasks}>Clear All Tasks</button>
+     <Footer clearAllTasks={clearAllTasks} />
     </div>
   );
 }
