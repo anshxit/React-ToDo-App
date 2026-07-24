@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useMemo, useCallback} from 'react';
 import Header from "./components/Header";
 import TaskInput from "./components/TaskInput";
 import TaskStats from "./components/TaskStats";
@@ -50,12 +50,12 @@ function App(){
     setTask("");
   }
 
-  function deleteTask(indexToDelete){
+  const deleteTask = useCallback((indexToDelete) => {
     const updatedTasks = tasks.filter((item, index) => {return index !== indexToDelete});
     setTasks(updatedTasks);
-  }
+  }, [tasks]);
 
-  function toggleTask(indexToToggle){
+  const toggleTask = useCallback((indexToToggle) => {
     const updatedTasks = tasks.map((item, index) => {
       if(index === indexToToggle){
         return {...item, completed: !item.completed};
@@ -63,7 +63,7 @@ function App(){
       return item;
     });
     setTasks(updatedTasks);
-  }
+  }, [tasks]);
 
   function clearAllTasks(){
     const confirmClear = window.confirm("Are you sure you want to clear all tasks?");
@@ -73,23 +73,25 @@ function App(){
     setTasks([]);
   }
 
-  function editTask(indexToEdit) {
+  const editTasks = useCallback((indexToEdit) => {
   setTask(tasks[indexToEdit].text);
   setEditIndex(indexToEdit);
-}
+}, [tasks]);
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter((item) => item.completed).length;
   const remainingTasks = totalTasks - completedTasks;
 
-  const filteredTasks = tasks.map((item, index) => ({ ...item, originalIndex :index })).filter((item) => {
-    if (filter === "active") {
-      return !item.completed;
-    } else if (filter === "completed") {
-      return item.completed;
-    }
-    return true; 
-  });
+  const filteredTasks = useMemo(() => {
+    return tasks.map((item, index) => ({ ...item, originalIndex: index })).filter((item) => {
+      if (filter === "active") {
+        return !item.completed;
+      } else if (filter === "completed") {
+        return item.completed;
+      }
+      return true;
+    });
+  }, [tasks, filter]);
 
   return(
     <div className="container">
@@ -117,7 +119,7 @@ function App(){
         filteredTasks={filteredTasks}
         filter={filter}
         toggleTask={toggleTask}
-        editTask={editTask}
+        editTask={editTasks}
         deleteTask={deleteTask}
       />
 

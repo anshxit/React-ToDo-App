@@ -1,3 +1,4 @@
+import React from "react";
 function TaskItem({
   item,
   toggleTask,
@@ -35,4 +36,4 @@ function TaskItem({
   );
 }
 
-export default TaskItem;
+export default React.memo(TaskItem);
